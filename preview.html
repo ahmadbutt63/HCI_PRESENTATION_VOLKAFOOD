@@ -1,0 +1,2064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Volka Food International — Redesigned Prototype</title>
+<style>
+  /* ── TOKENS ─────────────────────────────────────────────── */
+  :root {
+    --navy:   #1F3864;
+    --navy2:  #162d54;
+    --red:    #E63B2E;
+    --red2:   #c4301f;
+    --white:  #FFFFFF;
+    --off:    #F7F9FC;
+    --lgray:  #EEF2F8;
+    --mgray:  #C8D4E8;
+    --dgray:  #4A5568;
+    --text:   #1A202C;
+    --accent: #2D6DB5;
+    --green:  #1A7A3C;
+    --gold:   #C9910A;
+    --purple: #7B2D8B;
+    --teal:   #1A6B5A;
+    --r:      6px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.09);
+    --shadow2: 0 4px 24px rgba(0,0,0,0.13);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--off); color: var(--text); font-size: 15px; line-height: 1.6; }
+
+  /* ── SCREEN SYSTEM ──────────────────────────────────────── */
+  .screen { display: none; min-height: 100vh; flex-direction: column; }
+  .screen.active { display: flex; }
+
+  /* ── NAV ─────────────────────────────────────────────────── */
+  nav {
+    background: var(--navy);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 40px; height: 64px; position: sticky; top: 0; z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+  }
+  .nav-logo { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+  .nav-logo-mark {
+    width: 38px; height: 38px; background: var(--red); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; color: #fff; font-size: 16px; letter-spacing: -1px;
+  }
+  .nav-logo-text { color: #fff; font-size: 17px; font-weight: 700; line-height: 1.1; }
+  .nav-logo-text span { display: block; font-size: 10px; font-weight: 400; color: var(--mgray); letter-spacing: 1.5px; text-transform: uppercase; }
+  .nav-links { display: flex; align-items: center; gap: 6px; }
+  .nav-links a {
+    color: #c5d3e8; font-size: 13px; padding: 6px 14px; border-radius: 4px;
+    cursor: pointer; transition: all .18s; text-decoration: none; font-weight: 500;
+  }
+  .nav-links a:hover, .nav-links a.active { color: #fff; background: rgba(255,255,255,0.12); }
+  .nav-right { display: flex; align-items: center; gap: 12px; }
+  .lang-toggle {
+    display: flex; border: 1px solid rgba(255,255,255,0.25); border-radius: 5px; overflow: hidden;
+  }
+  .lang-toggle button {
+    background: none; border: none; color: #a0b4cc; font-size: 11px; font-weight: 600;
+    padding: 4px 9px; cursor: pointer; transition: all .15s; letter-spacing: .5px;
+  }
+  .lang-toggle button.active, .lang-toggle button:hover { background: var(--red); color: #fff; }
+  .nav-enquiry-btn {
+    background: var(--red); color: #fff; border: none; border-radius: 5px;
+    padding: 8px 18px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: background .15s; display: flex; align-items: center; gap: 6px;
+  }
+  .nav-enquiry-btn:hover { background: var(--red2); }
+  .enquiry-badge {
+    background: #fff; color: var(--red); border-radius: 10px; padding: 1px 6px;
+    font-size: 11px; font-weight: 800; min-width: 18px; text-align: center;
+  }
+
+  /* ── BREADCRUMB ─────────────────────────────────────────── */
+  .breadcrumb {
+    background: var(--lgray); border-bottom: 1px solid var(--mgray);
+    padding: 9px 40px; font-size: 12px; color: var(--dgray);
+    display: flex; align-items: center; gap: 6px;
+  }
+  .breadcrumb a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--mgray); }
+  .breadcrumb .current { color: var(--text); font-weight: 600; }
+
+  /* ── HERO SLIDER ─────────────────────────────────────────── */
+  .hero-slider { position: relative; overflow: hidden; background: var(--navy); height: 420px; }
+  .hero-slides { display: flex; transition: transform .5s ease; height: 100%; }
+  .hero-slide {
+    min-width: 100%; height: 100%; display: flex; align-items: center;
+    padding: 0 80px; position: relative;
+  }
+  .hero-slide::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(105deg, rgba(31,56,100,0.97) 45%, rgba(31,56,100,0.55) 100%);
+  }
+  .hero-slide-bg {
+    position: absolute; inset: 0; background-size: cover; background-position: center;
+  }
+  .hero-slide-1 .hero-slide-bg { background: linear-gradient(135deg,#1F3864 0%,#2d5a8e 50%,#1a3060 100%); }
+  .hero-slide-2 .hero-slide-bg { background: linear-gradient(135deg,#2a1f64 0%,#3d2d8e 50%,#1a1a60 100%); }
+  .hero-slide-3 .hero-slide-bg { background: linear-gradient(135deg,#1f3a20 0%,#2d5e30 50%,#1a3a1c 100%); }
+  .hero-slide-4 .hero-slide-bg { background: linear-gradient(135deg,#641f1f 0%,#8e2d2d 50%,#601a1a 100%); }
+  .hero-content { position: relative; z-index: 2; max-width: 560px; }
+  .hero-eyebrow { color: var(--red); font-size: 11px; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-bottom: 14px; }
+  .hero-title { color: #fff; font-size: 40px; font-weight: 800; line-height: 1.15; margin-bottom: 16px; }
+  .hero-title em { color: #a8c4f0; font-style: normal; }
+  .hero-desc { color: #c8d8ef; font-size: 15px; line-height: 1.7; margin-bottom: 28px; max-width: 480px; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    background: var(--red); color: #fff; border: none; border-radius: var(--r);
+    padding: 13px 28px; font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all .18s; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-primary:hover { background: var(--red2); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(230,59,46,0.4); }
+  .btn-outline {
+    background: transparent; color: #fff; border: 1.5px solid rgba(255,255,255,0.45);
+    border-radius: var(--r); padding: 12px 24px; font-size: 14px; font-weight: 600;
+    cursor: pointer; transition: all .18s;
+  }
+  .btn-outline:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.7); }
+
+  /* Slider controls */
+  .slider-controls {
+    position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 14px; z-index: 10;
+  }
+  .slider-dots { display: flex; gap: 8px; }
+  .slider-dot {
+    width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.35);
+    cursor: pointer; transition: all .2s; border: none;
+  }
+  .slider-dot.active { background: #fff; transform: scale(1.3); }
+  .slider-counter { color: rgba(255,255,255,0.7); font-size: 12px; font-weight: 600; min-width: 52px; text-align: center; }
+  .slider-pause {
+    width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3); color: #fff; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; font-size: 10px;
+    transition: background .15s;
+  }
+  .slider-pause:hover { background: rgba(255,255,255,0.28); }
+  .slider-arrow {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 40px; height: 40px; background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3); border-radius: 50%;
+    color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; z-index: 10; transition: background .15s;
+  }
+  .slider-arrow:hover { background: rgba(255,255,255,0.28); }
+  .slider-prev { left: 20px; }
+  .slider-next { right: 20px; }
+
+  /* ── SEARCH BAR ─────────────────────────────────────────── */
+  .search-section { background: #fff; border-bottom: 1px solid var(--mgray); padding: 18px 40px; }
+  .search-wrap { max-width: 900px; margin: 0 auto; }
+  .search-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .search-input-wrap {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    background: var(--off); border: 1.5px solid var(--mgray); border-radius: var(--r);
+    padding: 10px 16px; transition: border-color .18s;
+  }
+  .search-input-wrap:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,109,181,0.1); }
+  .search-input-wrap input {
+    flex: 1; border: none; background: none; font-size: 15px; color: var(--text);
+    outline: none; font-family: inherit;
+  }
+  .search-input-wrap input::placeholder { color: #a0aec0; }
+  .search-icon { color: #a0aec0; font-size: 18px; }
+  .search-btn {
+    background: var(--navy); color: #fff; border: none; border-radius: var(--r);
+    padding: 10px 24px; font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: background .15s; white-space: nowrap;
+  }
+  .search-btn:hover { background: var(--navy2); }
+  .filter-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .filter-chip {
+    background: var(--lgray); border: 1.5px solid var(--mgray); border-radius: 20px;
+    padding: 5px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+    transition: all .15s; color: var(--dgray);
+  }
+  .filter-chip:hover, .filter-chip.active {
+    background: var(--navy); border-color: var(--navy); color: #fff;
+  }
+
+  /* ── MAIN CONTENT ───────────────────────────────────────── */
+  .page-body { flex: 1; padding: 32px 40px; max-width: 1200px; width: 100%; margin: 0 auto; }
+  .section-heading { font-size: 22px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+  .section-sub { color: var(--dgray); font-size: 14px; margin-bottom: 24px; }
+
+  /* ── BRAND CARDS (Homepage) ─────────────────────────────── */
+  .brand-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+  .brand-card {
+    background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer;
+    box-shadow: var(--shadow); transition: all .22s; border: 1.5px solid transparent;
+  }
+  .brand-card:hover { transform: translateY(-4px); box-shadow: var(--shadow2); border-color: var(--accent); }
+  .brand-card-img {
+    height: 130px; display: flex; align-items: center; justify-content: center;
+    font-size: 32px; font-weight: 900; letter-spacing: -1px;
+  }
+  .brand-giggly .brand-card-img { background: linear-gradient(135deg, #FF6B6B, #FF8E53); color: #fff; }
+  .brand-marios .brand-card-img { background: linear-gradient(135deg, #4facfe, #00f2fe); color: #fff; }
+  .brand-cookania .brand-card-img { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
+  .brand-opus .brand-card-img { background: linear-gradient(135deg, #1a1a2e, #16213e); color: #c9a227; }
+  .brand-royal .brand-card-img { background: linear-gradient(135deg, #8B0000, #c9a227); color: #fff; }
+  .brand-card-body { padding: 14px 16px; }
+  .brand-card-name { font-weight: 700; font-size: 15px; color: var(--navy); margin-bottom: 4px; }
+  .brand-card-desc { font-size: 12px; color: var(--dgray); line-height: 1.5; margin-bottom: 10px; }
+  .brand-card-footer { display: flex; justify-content: space-between; align-items: center; }
+  .brand-explore {
+    color: var(--accent); font-size: 12px; font-weight: 600; cursor: pointer;
+    border: none; background: none; padding: 0; transition: color .15s;
+  }
+  .brand-explore:hover { color: var(--red); }
+  .brand-tag {
+    font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: 600;
+    background: var(--lgray); color: var(--dgray);
+  }
+
+  /* ── NEWS STRIP ─────────────────────────────────────────── */
+  .news-strip { background: #fff; border-radius: 10px; box-shadow: var(--shadow); padding: 24px 28px; margin-bottom: 40px; }
+  .news-strip h3 { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .news-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  .news-item { border-left: 3px solid var(--accent); padding-left: 14px; }
+  .news-date { font-size: 11px; color: var(--dgray); margin-bottom: 4px; }
+  .news-title { font-size: 13px; font-weight: 600; color: var(--navy); }
+
+  /* ── CONTACT FORM ───────────────────────────────────────── */
+  .contact-section { background: var(--navy); padding: 48px 40px; }
+  .contact-inner { max-width: 700px; margin: 0 auto; }
+  .contact-title { color: #fff; font-size: 26px; font-weight: 800; margin-bottom: 8px; }
+  .contact-sub { color: var(--mgray); font-size: 14px; margin-bottom: 28px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1/-1; }
+  .form-group label { color: #c8d8ef; font-size: 12px; font-weight: 600; letter-spacing: .5px; }
+  .form-group input, .form-group textarea, .form-group select {
+    background: rgba(255,255,255,0.08); border: 1.5px solid rgba(255,255,255,0.2);
+    border-radius: var(--r); padding: 10px 14px; font-size: 14px; color: #fff;
+    font-family: inherit; outline: none; transition: all .18s;
+  }
+  .form-group input::placeholder, .form-group textarea::placeholder { color: rgba(255,255,255,0.35); }
+  .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+    border-color: var(--accent); background: rgba(255,255,255,0.12);
+    box-shadow: 0 0 0 3px rgba(45,109,181,0.25);
+  }
+  .form-group input.valid { border-color: #48BB78; }
+  .form-group input.error { border-color: var(--red); }
+  .form-group select option { background: var(--navy); color: #fff; }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .field-hint { font-size: 11px; color: rgba(255,255,255,0.4); }
+  .field-error { font-size: 11px; color: #FC8181; display: none; }
+  .field-error.show { display: block; }
+  .form-submit {
+    background: var(--red); color: #fff; border: none; border-radius: var(--r);
+    padding: 14px 36px; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all .18s; display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 6px;
+  }
+  .form-submit:hover { background: var(--red2); transform: translateY(-1px); }
+  .success-banner {
+    background: #1a7a3c; border: 1.5px solid #48BB78; border-radius: var(--r);
+    padding: 18px 22px; display: none; align-items: flex-start; gap: 14px;
+    margin-bottom: 20px;
+  }
+  .success-banner.show { display: flex; }
+  .success-icon { font-size: 24px; flex-shrink: 0; }
+  .success-title { color: #fff; font-weight: 700; font-size: 15px; }
+  .success-ref { color: #9ae6b4; font-size: 13px; margin-top: 2px; }
+
+  /* ── SCREEN 2: LISTING ──────────────────────────────────── */
+  .listing-layout { display: flex; gap: 28px; align-items: flex-start; }
+  .sidebar {
+    width: 230px; flex-shrink: 0; background: #fff;
+    border-radius: 10px; box-shadow: var(--shadow); padding: 20px;
+    position: sticky; top: 84px;
+  }
+  .sidebar-title { font-size: 13px; font-weight: 700; color: var(--navy); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 14px; }
+  .filter-section { margin-bottom: 20px; }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--dgray); margin-bottom: 8px; }
+  .filter-option { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; cursor: pointer; }
+  .filter-option input[type="checkbox"] { accent-color: var(--navy); }
+  .filter-option span { font-size: 13px; color: var(--text); }
+  .filter-option .count { color: var(--dgray); font-size: 11px; margin-left: auto; }
+  .active-filters { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .active-tag {
+    background: var(--navy); color: #fff; border-radius: 20px; padding: 3px 10px 3px 12px;
+    font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 5px;
+  }
+  .active-tag button { background: none; border: none; color: rgba(255,255,255,0.7); cursor: pointer; font-size: 13px; line-height: 1; padding: 0; }
+  .listing-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .results-count { font-size: 13px; color: var(--dgray); }
+  .sort-select {
+    border: 1.5px solid var(--mgray); border-radius: var(--r); padding: 7px 12px;
+    font-size: 13px; color: var(--text); background: #fff; outline: none; cursor: pointer;
+  }
+  .products-grid { flex: 1; }
+  .product-grid-inner { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+  .no-results { grid-column: 1 / -1; text-align: center; padding: 60px 20px; }
+  .no-results-icon { font-size: 44px; margin-bottom: 12px; opacity: 0.4; }
+  .no-results-title { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+  .no-results-sub { font-size: 14px; color: var(--dgray); margin-bottom: 18px; }
+  .product-card {
+    background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer;
+    box-shadow: var(--shadow); transition: all .2s; border: 1.5px solid transparent;
+  }
+  .product-card:hover { transform: translateY(-3px); box-shadow: var(--shadow2); border-color: var(--accent); }
+  .product-img {
+    height: 150px; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; color: rgba(255,255,255,0.9);
+    letter-spacing: -.5px; text-align: center; padding: 10px;
+  }
+  .product-body { padding: 12px 14px; }
+  .product-name { font-weight: 700; font-size: 13px; color: var(--navy); margin-bottom: 3px; }
+  .product-meta { font-size: 11px; color: var(--dgray); margin-bottom: 8px; }
+  .product-footer { display: flex; justify-content: space-between; align-items: center; }
+  .in-stock { background: #E8F5E9; color: var(--green); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .out-stock { background: #FDECEA; color: var(--red); font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 10px; }
+  .add-enquiry {
+    background: none; border: 1.5px solid var(--accent); border-radius: 5px;
+    color: var(--accent); font-size: 11px; font-weight: 600; padding: 4px 9px; cursor: pointer;
+    transition: all .15s;
+  }
+  .add-enquiry:hover, .add-enquiry.added { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+  /* ── SCREEN 3: PRODUCT DETAIL ───────────────────────────── */
+  .product-detail-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+  .product-img-main {
+    background: linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);
+    border-radius: 12px; height: 380px; display: flex; align-items: center; justify-content: center;
+    color: #c9a227; font-size: 64px; font-weight: 900; letter-spacing: -2px;
+    box-shadow: var(--shadow2);
+  }
+  .product-detail-info {}
+  .product-detail-eyebrow { font-size: 11px; font-weight: 700; color: var(--red); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .product-detail-name { font-size: 32px; font-weight: 800; color: var(--navy); line-height: 1.15; margin-bottom: 12px; }
+  .product-detail-desc { color: var(--dgray); font-size: 14px; line-height: 1.7; margin-bottom: 20px; }
+  .flavour-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+  .flavour-pill {
+    padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid var(--mgray); background: #fff; cursor: pointer; transition: all .15s;
+  }
+  .flavour-pill.active, .flavour-pill:hover { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .sku-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13px; }
+  .sku-table th { background: var(--navy); color: #fff; padding: 9px 12px; text-align: left; font-size: 11px; letter-spacing: .5px; }
+  .sku-table td { padding: 9px 12px; border-bottom: 1px solid var(--lgray); }
+  .sku-table tr:nth-child(even) td { background: var(--off); }
+  .sku-table tr:hover td { background: var(--lgray); }
+  .detail-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 24px; }
+  .btn-navy {
+    background: var(--navy); color: #fff; border: none; border-radius: var(--r);
+    padding: 12px 22px; font-size: 13px; font-weight: 700; cursor: pointer;
+    transition: all .15s; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-navy:hover { background: var(--navy2); }
+  .btn-ghost {
+    background: #fff; color: var(--navy); border: 1.5px solid var(--navy); border-radius: var(--r);
+    padding: 11px 20px; font-size: 13px; font-weight: 600; cursor: pointer;
+    transition: all .15s; display: inline-flex; align-items: center; gap: 7px;
+  }
+  .btn-ghost:hover { background: var(--lgray); }
+  .specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--lgray); border-radius: var(--r); padding: 16px; margin-bottom: 20px; }
+  .spec-item { }
+  .spec-label { font-size: 11px; color: var(--dgray); font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+  .spec-value { font-size: 14px; color: var(--text); font-weight: 600; }
+  .detail-tabs { display: flex; gap: 0; border-bottom: 2px solid var(--mgray); margin-bottom: 20px; }
+  .detail-tab {
+    padding: 10px 20px; font-size: 13px; font-weight: 600; color: var(--dgray);
+    cursor: pointer; border-bottom: 2.5px solid transparent; margin-bottom: -2px; transition: all .15s;
+  }
+  .detail-tab.active { color: var(--navy); border-bottom-color: var(--navy); }
+  .detail-tab:hover { color: var(--navy); }
+  .tab-content { display: none; font-size: 14px; color: var(--dgray); line-height: 1.7; }
+  .tab-content.active { display: block; }
+  .cert-badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .cert-badge {
+    background: var(--lgray); border: 1.5px solid var(--mgray); border-radius: var(--r);
+    padding: 6px 14px; font-size: 12px; font-weight: 600; color: var(--navy);
+    display: flex; align-items: center; gap: 5px;
+  }
+  .related-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 10px; }
+
+  /* ── SCREEN 4: ENQUIRY LIST ─────────────────────────────── */
+  .progress-bar { background: #fff; border-bottom: 1px solid var(--mgray); padding: 20px 40px; }
+  .progress-steps { display: flex; justify-content: center; gap: 0; max-width: 600px; margin: 0 auto; }
+  .progress-step { display: flex; flex-direction: column; align-items: center; flex: 1; position: relative; }
+  .progress-step:not(:last-child)::after {
+    content: ''; position: absolute; top: 16px; left: 50%; width: 100%; height: 2px;
+    background: var(--mgray); z-index: 0;
+  }
+  .progress-step.done::after, .progress-step.active::after { background: var(--navy); }
+  .step-dot {
+    width: 32px; height: 32px; border-radius: 50%; border: 2.5px solid var(--mgray);
+    background: #fff; display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; color: var(--dgray); z-index: 1; position: relative;
+  }
+  .progress-step.done .step-dot { background: var(--navy); border-color: var(--navy); color: #fff; }
+  .progress-step.active .step-dot { background: var(--navy); border-color: var(--navy); color: #fff; box-shadow: 0 0 0 4px rgba(31,56,100,0.15); }
+  .step-label { font-size: 11px; font-weight: 600; color: var(--dgray); margin-top: 6px; text-align: center; }
+  .progress-step.active .step-label, .progress-step.done .step-label { color: var(--navy); }
+  .enquiry-layout { display: flex; gap: 28px; align-items: flex-start; }
+  .enquiry-main { flex: 1; }
+  .enquiry-sidebar { width: 280px; flex-shrink: 0; }
+  .enquiry-card { background: #fff; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; }
+  .enquiry-card-header {
+    background: var(--navy); color: #fff; padding: 14px 18px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .enquiry-card-header h3 { font-size: 14px; font-weight: 700; }
+  .enquiry-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--lgray); }
+  .enquiry-item:last-child { border-bottom: none; }
+  .enquiry-item-img {
+    width: 60px; height: 60px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: rgba(255,255,255,.9);
+  }
+  .enquiry-item-info { flex: 1; }
+  .enquiry-item-name { font-weight: 700; font-size: 13px; color: var(--navy); margin-bottom: 2px; }
+  .enquiry-item-sku { font-size: 11px; color: var(--dgray); margin-bottom: 6px; }
+  .qty-control { display: flex; align-items: center; gap: 8px; }
+  .qty-btn {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--lgray); border: 1px solid var(--mgray);
+    display: flex; align-items: center; justify-content: center; cursor: pointer;
+    font-size: 14px; font-weight: 700; color: var(--navy); transition: all .15s;
+  }
+  .qty-btn:hover { background: var(--navy); color: #fff; }
+  .qty-val { font-size: 13px; font-weight: 700; min-width: 28px; text-align: center; }
+  .enquiry-remove {
+    background: none; border: none; color: #a0aec0; cursor: pointer; font-size: 18px;
+    transition: color .15s; padding: 4px;
+  }
+  .enquiry-remove:hover { color: var(--red); }
+  .summary-card { background: #fff; border-radius: 10px; box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
+  .summary-title { font-weight: 700; font-size: 14px; color: var(--navy); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; border-bottom: 1px solid var(--lgray); }
+  .summary-row:last-child { border: none; font-weight: 700; color: var(--navy); font-size: 14px; padding-top: 10px; }
+  .autosave { color: var(--green); font-size: 12px; display: flex; align-items: center; gap: 5px; margin-bottom: 12px; }
+  .notes-area {
+    width: 100%; border: 1.5px solid var(--mgray); border-radius: var(--r); padding: 10px 14px;
+    font-size: 13px; color: var(--text); font-family: inherit; outline: none; resize: none;
+    min-height: 80px; transition: border-color .18s;
+  }
+  .notes-area:focus { border-color: var(--accent); }
+
+  /* ── SCREEN 5: SUBMIT ENQUIRY ───────────────────────────── */
+  .submit-layout { display: grid; grid-template-columns: 1fr 320px; gap: 28px; align-items: flex-start; }
+  .submit-form-card { background: #fff; border-radius: 10px; box-shadow: var(--shadow); overflow: hidden; }
+  .submit-form-header { background: var(--navy); padding: 18px 24px; }
+  .submit-form-header h2 { color: #fff; font-size: 18px; font-weight: 700; }
+  .submit-form-header p { color: var(--mgray); font-size: 13px; margin-top: 3px; }
+  .submit-form-body { padding: 24px; }
+  .submit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .submit-group { display: flex; flex-direction: column; gap: 6px; }
+  .submit-group.full { grid-column: 1/-1; }
+  .submit-group label { font-size: 12px; font-weight: 600; color: var(--dgray); letter-spacing: .5px; }
+  .submit-input {
+    border: 1.5px solid var(--mgray); border-radius: var(--r); padding: 10px 14px;
+    font-size: 14px; color: var(--text); font-family: inherit; outline: none;
+    transition: all .18s; background: #fff;
+  }
+  .submit-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(45,109,181,0.1); }
+  .submit-input.valid { border-color: var(--green); }
+  .submit-input.error { border-color: var(--red); }
+  .validate-icon { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 14px; }
+  .input-wrap { position: relative; }
+  .submit-confirm-btn {
+    width: 100%; background: var(--red); color: #fff; border: none; border-radius: var(--r);
+    padding: 15px; font-size: 15px; font-weight: 700; cursor: pointer;
+    transition: all .18s; display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin-top: 20px;
+  }
+  .submit-confirm-btn:hover { background: var(--red2); }
+  .what-next { background: var(--navy); border-radius: 10px; padding: 22px; box-shadow: var(--shadow); }
+  .what-next-title { color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 18px; display: flex; align-items: center; gap: 8px; }
+  .timeline { display: flex; flex-direction: column; gap: 0; }
+  .tl-item { display: flex; gap: 14px; padding-bottom: 18px; position: relative; }
+  .tl-item:not(:last-child)::after {
+    content: ''; position: absolute; left: 15px; top: 34px; bottom: 0; width: 2px;
+    background: rgba(255,255,255,0.15);
+  }
+  .tl-dot {
+    width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center; font-size: 12px;
+    background: rgba(255,255,255,0.12); color: #fff; font-weight: 700; z-index: 1;
+  }
+  .tl-content {}
+  .tl-time { font-size: 11px; color: #a8c4f0; font-weight: 600; margin-bottom: 2px; }
+  .tl-text { font-size: 13px; color: #e2ecf8; }
+  .success-full {
+    background: var(--green); border-radius: 10px; padding: 24px; display: none;
+    margin-bottom: 20px;
+  }
+  .success-full.show { display: block; }
+  .success-full-top { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+  .success-full-icon { font-size: 32px; }
+  .success-full-title { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 3px; }
+  .success-full-ref { background: rgba(255,255,255,0.2); border-radius: 5px; padding: 8px 14px; color: #fff; font-size: 13px; }
+  .success-full-ref strong { font-family: monospace; font-size: 15px; }
+  .success-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .btn-white {
+    background: #fff; color: var(--navy); border: none; border-radius: var(--r);
+    padding: 10px 20px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all .15s;
+  }
+  .btn-white:hover { background: var(--lgray); }
+
+  /* ── FOOTER ─────────────────────────────────────────────── */
+  footer { background: #111827; color: #9ca3af; padding: 40px; margin-top: auto; }
+  .footer-inner { max-width: 1120px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; }
+  .footer-brand-name { color: #fff; font-size: 18px; font-weight: 800; margin-bottom: 6px; }
+  .footer-brand-desc { font-size: 13px; line-height: 1.7; }
+  .footer-col-title { color: #fff; font-size: 13px; font-weight: 700; margin-bottom: 14px; letter-spacing: .5px; }
+  .footer-links { display: flex; flex-direction: column; gap: 8px; }
+  .footer-links a { color: #9ca3af; font-size: 13px; cursor: pointer; text-decoration: none; transition: color .15s; }
+  .footer-links a:hover { color: #fff; }
+  .footer-bottom { border-top: 1px solid #1f2937; padding-top: 20px; margin-top: 32px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+  .footer-socials { display: flex; gap: 10px; }
+  .social-icon {
+    width: 32px; height: 32px; border-radius: 50%; background: #1f2937;
+    display: flex; align-items: center; justify-content: center; font-size: 13px;
+    cursor: pointer; transition: background .15s;
+  }
+  .social-icon:hover { background: var(--red); }
+
+  /* ── PROTOTYPE LABEL ───────────────────────────────────── */
+  .proto-banner {
+    background: var(--red); color: #fff; text-align: center; padding: 7px;
+    font-size: 12px; font-weight: 600; letter-spacing: .5px; position: fixed;
+    bottom: 0; left: 0; right: 0; z-index: 200; display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .proto-banner span { opacity: .8; }
+
+  /* ── UTILITY ─────────────────────────────────────────────── */
+  .pill-red { background: #FDECEA; color: var(--red); border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+  .pill-green { background: #E8F5E9; color: var(--green); border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+  .pill-navy { background: var(--lgray); color: var(--navy); border-radius: 20px; padding: 2px 9px; font-size: 11px; font-weight: 600; }
+
+  @media (max-width: 900px) {
+    nav { padding: 0 16px; }
+    .page-body { padding: 20px 16px; }
+    .hero-slide { padding: 0 24px; }
+    .hero-title { font-size: 28px; }
+    .listing-layout { flex-direction: column; }
+    .sidebar { width: 100%; position: static; }
+    .product-detail-layout { grid-template-columns: 1fr; }
+    .submit-layout { grid-template-columns: 1fr; }
+    .enquiry-layout { flex-direction: column; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .contact-section { padding: 32px 16px; }
+    .search-section { padding: 14px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 1: HOMEPAGE                                      -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen active" id="screen1">
+
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a class="active" onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a>
+      <a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a>
+      <a onclick="goScreen(8)" data-i18n="navExport">Export</a>
+      <a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang(this,'EN')">EN</button>
+        <button onclick="setLang(this,'UR')">UR</button>
+        <button onclick="setLang(this,'AR')">AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge1">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a>
+  </div>
+
+  <!-- Hero Slider -->
+  <div class="hero-slider">
+    <button class="slider-arrow slider-prev" onclick="slideMove(-1)">&#8249;</button>
+    <button class="slider-arrow slider-next" onclick="slideMove(1)">&#8250;</button>
+    <div class="hero-slides" id="heroSlides">
+      <div class="hero-slide hero-slide-1">
+        <div class="hero-slide-bg"></div>
+        <div class="hero-content">
+          <div class="hero-eyebrow">Introducing GIGGLY 2026 Range</div>
+          <div class="hero-title">Pakistan's Favourite <em>Confectionery</em> Brand</div>
+          <div class="hero-desc">New flavours, new packaging — GIGGLY Jellies now come in 6 exciting variants. Perfect for every occasion and every age.</div>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="goScreen(3)">Explore GIGGLY &#8594;</button>
+            <button class="btn-outline" onclick="goScreen(2)">View All Products</button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide hero-slide-2">
+        <div class="hero-slide-bg"></div>
+        <div class="hero-content">
+          <div class="hero-eyebrow">OPUS Premium Chocolate</div>
+          <div class="hero-title">Luxury Chocolate, <em>Crafted for Gifting</em></div>
+          <div class="hero-desc">OPUS Silk Chocolate — available in 80g, 150g, and premium gift boxes. Halal certified, export-ready, and available in 12+ markets.</div>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="goScreen(3)">View OPUS Range &#8594;</button>
+            <button class="btn-outline">Download Catalogue</button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide hero-slide-3">
+        <div class="hero-slide-bg"></div>
+        <div class="hero-content">
+          <div class="hero-eyebrow">COOKANIA Bakery Collection</div>
+          <div class="hero-title">Baked with <em>Quality You Can Taste</em></div>
+          <div class="hero-desc">From cream-filled cookies to premium biscuits — COOKANIA's 2026 range covers 30+ SKUs across 5 product lines, now with expanded carton options.</div>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="goScreen(2)">Browse COOKANIA &#8594;</button>
+            <button class="btn-outline">Request Trade Pricing</button>
+          </div>
+        </div>
+      </div>
+      <div class="hero-slide hero-slide-4">
+        <div class="hero-slide-bg"></div>
+        <div class="hero-content">
+          <div class="hero-eyebrow">Export & B2B Partnership</div>
+          <div class="hero-title">Supplying <em>30+ Markets</em> Across the Middle East</div>
+          <div class="hero-desc">Volka Food exports to UAE, Saudi Arabia, Kuwait, and beyond. Trade catalogues, MOQ sheets, and halal certifications available on request.</div>
+          <div class="hero-cta">
+            <button class="btn-primary" onclick="scrollContact()">Start Trade Enquiry &#8594;</button>
+            <button class="btn-outline">Export Catalogue</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slider-controls">
+      <button class="slider-pause" id="sliderPauseBtn" onclick="togglePause()" title="Pause slider">&#10074;&#10074;</button>
+      <div class="slider-dots" id="sliderDots">
+        <button class="slider-dot active" onclick="goSlide(0)"></button>
+        <button class="slider-dot" onclick="goSlide(1)"></button>
+        <button class="slider-dot" onclick="goSlide(2)"></button>
+        <button class="slider-dot" onclick="goSlide(3)"></button>
+      </div>
+      <div class="slider-counter" id="sliderCounter">Slide 1 of 4</div>
+    </div>
+  </div>
+
+  <!-- Search Section -->
+  <div class="search-section">
+    <div class="search-wrap">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" placeholder="Search products, brands, SKUs… e.g. GIGGLY Jellies, OPUS Silk, Cookania Biscuits" id="homeSearch" onkeydown="if(event.key==='Enter') runHomeSearch()">
+        </div>
+        <button class="search-btn" onclick="runHomeSearch()">Search</button>
+      </div>
+      <div class="filter-chips">
+        <button class="filter-chip active" onclick="toggleChip(this)">All Products</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Confectionery</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Bakery</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Pasta</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Chocolate</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Export Ready</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Body -->
+  <div class="page-body" style="max-width:1200px;margin:0 auto;width:100%;padding:32px 40px">
+
+    <div class="section-heading">Our Brands</div>
+    <div class="section-sub">Five iconic brands — from playful jellies to premium chocolate</div>
+    <div class="brand-grid">
+      <div class="brand-card brand-giggly" onclick="goScreen(2)">
+        <div class="brand-card-img">GIGGLY</div>
+        <div class="brand-card-body">
+          <div class="brand-card-name">GIGGLY</div>
+          <div class="brand-card-desc">Pakistan's favourite confectionery brand — jellies, gummies, and fruity treats loved by millions.</div>
+          <div class="brand-card-footer">
+            <button class="brand-explore" onclick="goScreen(2)">Explore Now →</button>
+            <span class="brand-tag">Confectionery</span>
+          </div>
+        </div>
+      </div>
+      <div class="brand-card brand-marios" onclick="goScreen(2)">
+        <div class="brand-card-img">MARIOS</div>
+        <div class="brand-card-body">
+          <div class="brand-card-name">MARIOS</div>
+          <div class="brand-card-desc">Premium pasta and noodles — crafted for restaurants, households, and food service chains.</div>
+          <div class="brand-card-footer">
+            <button class="brand-explore">Explore Now →</button>
+            <span class="brand-tag">Pasta</span>
+          </div>
+        </div>
+      </div>
+      <div class="brand-card brand-cookania" onclick="goScreen(2)">
+        <div class="brand-card-img">COOKANIA</div>
+        <div class="brand-card-body">
+          <div class="brand-card-name">COOKANIA</div>
+          <div class="brand-card-desc">Award-winning bakery range — biscuits, cookies, and cream wafers for everyday indulgence.</div>
+          <div class="brand-card-footer">
+            <button class="brand-explore">Explore Now →</button>
+            <span class="brand-tag">Bakery</span>
+          </div>
+        </div>
+      </div>
+      <div class="brand-card brand-opus" onclick="goScreen(3)">
+        <div class="brand-card-img">OPUS</div>
+        <div class="brand-card-body">
+          <div class="brand-card-name">OPUS</div>
+          <div class="brand-card-desc">Premium chocolate range — Silk, Dark, and Gift Edition. Halal certified and export-ready.</div>
+          <div class="brand-card-footer">
+            <button class="brand-explore" onclick="goScreen(3)">Explore Now →</button>
+            <span class="brand-tag">Chocolate</span>
+          </div>
+        </div>
+      </div>
+      <div class="brand-card brand-royal" onclick="goScreen(2)">
+        <div class="brand-card-img">ROYAL</div>
+        <div class="brand-card-body">
+          <div class="brand-card-name">COOKANIA ROYAL</div>
+          <div class="brand-card-desc">Luxury bakery items for gifting and premium retail placement — the finest of the COOKANIA family.</div>
+          <div class="brand-card-footer">
+            <button class="brand-explore">Explore Now →</button>
+            <span class="brand-tag">Luxury Bakery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News strip -->
+    <div class="news-strip">
+      <h3>&#128240; Events &amp; Media</h3>
+      <div class="news-grid">
+        <div class="news-item">
+          <div class="news-date">May 2026</div>
+          <div class="news-title">Volka Food launches OPUS Gift Edition at Lahore Trade Expo 2026</div>
+        </div>
+        <div class="news-item">
+          <div class="news-date">Apr 2026</div>
+          <div class="news-title">GIGGLY named Top Confectionery Brand at FMCG Pakistan Awards</div>
+        </div>
+        <div class="news-item">
+          <div class="news-date">Mar 2026</div>
+          <div class="news-title">Volka Food expands export to 3 new GCC markets — MOQ sheets now available</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-body -->
+
+  <!-- Contact Form -->
+  <div class="contact-section" id="contactSection">
+    <div class="contact-inner">
+      <div class="contact-title">Got a Question?</div>
+      <div class="contact-sub">Whether you're a distributor, retailer, or international buyer — we'd love to hear from you. Expect a reply within 24 hours.</div>
+
+      <div class="success-banner" id="homeSB">
+        <div class="success-icon">✅</div>
+        <div>
+          <div class="success-title">Message received — thank you!</div>
+          <div class="success-ref">Reference: <strong>VF-INQ-2026-01249</strong> &nbsp;·&nbsp; You'll receive a confirmation email shortly.</div>
+        </div>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>FULL NAME *</label>
+          <input type="text" id="hName" placeholder="Your full name" oninput="validateField(this)">
+          <span class="field-error" id="hNameErr">Please enter your name</span>
+        </div>
+        <div class="form-group">
+          <label>EMAIL ADDRESS *</label>
+          <input type="email" id="hEmail" placeholder="your@email.com" oninput="validateField(this)">
+          <span class="field-error" id="hEmailErr">Please enter a valid email</span>
+        </div>
+        <div class="form-group">
+          <label>PHONE NUMBER</label>
+          <input type="tel" placeholder="+92 300 0000000">
+        </div>
+        <div class="form-group">
+          <label>ENQUIRY TYPE</label>
+          <select>
+            <option>General Enquiry</option>
+            <option>Trade / Wholesale Pricing</option>
+            <option>Export / Distribution</option>
+            <option>New Partnership</option>
+            <option>Product Information</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>YOUR MESSAGE *</label>
+          <textarea id="hMsg" placeholder="Tell us about your enquiry — product interest, quantities, territory…" oninput="validateField(this)"></textarea>
+          <span class="field-error" id="hMsgErr">Please write your message</span>
+        </div>
+      </div>
+      <button class="form-submit" onclick="submitContactForm()">Send Message &nbsp;&#10148;</button>
+    </div>
+  </div>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand-name">Volka Food International</div>
+        <div class="footer-brand-desc">Premium confectionery, bakery, and pasta products from Multan, Pakistan. Serving consumers and trade partners across 30+ markets since 2010.</div>
+      </div>
+      <div>
+        <div class="footer-col-title">Our Brands</div>
+        <div class="footer-links">
+          <a>GIGGLY</a><a>MARIOS</a><a>COOKANIA</a><a>OPUS</a><a>COOKANIA ROYAL</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Company</div>
+        <div class="footer-links">
+          <a>About Us</a><a>Careers</a><a>Events & Media</a><a>CSR</a><a>Export</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Contact</div>
+        <div class="footer-links">
+          <a>&#128222; +92 61 0000000</a>
+          <a>&#9993; trade@volkafood.com</a>
+          <a>&#128205; Multan, Pakistan</a>
+        </div>
+        <div class="footer-socials" style="margin-top:14px">
+          <div class="social-icon">&#120099;</div>
+          <div class="social-icon">&#120097;</div>
+          <div class="social-icon">&#120111;</div>
+          <div class="social-icon">&#120113;</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Volka Food International (Pvt.) Ltd. All rights reserved.</span>
+      <span>🇵🇰 Pakistan &nbsp;|&nbsp; Halal Certified &nbsp;|&nbsp; ISO 9001:2015</span>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 2: CATEGORY / LISTING PAGE                      -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen2">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)">Home</a>
+      <a class="active" onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a><a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a><a onclick="goScreen(8)" data-i18n="navExport">Export</a><a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active">EN</button><button>UR</button><button>AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge2">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <span class="current">Our Brands &amp; Products</span>
+  </div>
+
+  <div class="search-section">
+    <div class="search-wrap">
+      <div class="search-row">
+        <div class="search-input-wrap">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" id="listSearch" placeholder="Search within products… e.g. COOKANIA biscuits, OPUS Silk 80g" oninput="runListSearch()" onkeydown="if(event.key==='Enter') runListSearch()">
+        </div>
+        <button class="search-btn" onclick="runListSearch()">Search</button>
+      </div>
+      <div class="filter-chips" id="listChips">
+        <button class="filter-chip active" onclick="toggleChip(this)">All Products</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Confectionery</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Bakery</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Pasta</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Chocolate</button>
+        <button class="filter-chip" onclick="toggleChip(this)">Export Ready</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-body">
+    <div class="listing-layout">
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <div class="sidebar-title">Filters</div>
+        <div class="active-filters" id="activeFilters">
+          <div class="active-tag">All Products <button onclick="clearFilters()">×</button></div>
+        </div>
+        <div class="filter-section">
+          <div class="filter-label">Brand</div>
+          <label class="filter-option"><input type="checkbox" checked><span>GIGGLY</span><span class="count">12</span></label>
+          <label class="filter-option"><input type="checkbox" checked><span>MARIOS</span><span class="count">8</span></label>
+          <label class="filter-option"><input type="checkbox" checked><span>COOKANIA</span><span class="count">15</span></label>
+          <label class="filter-option"><input type="checkbox" checked><span>OPUS</span><span class="count">6</span></label>
+          <label class="filter-option"><input type="checkbox"><span>COOKANIA ROYAL</span><span class="count">4</span></label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-label">Category</div>
+          <label class="filter-option"><input type="checkbox" checked><span>Confectionery</span><span class="count">18</span></label>
+          <label class="filter-option"><input type="checkbox" checked><span>Bakery</span><span class="count">19</span></label>
+          <label class="filter-option"><input type="checkbox"><span>Pasta</span><span class="count">8</span></label>
+          <label class="filter-option"><input type="checkbox"><span>Chocolate</span><span class="count">6</span></label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-label">Pack Size</div>
+          <label class="filter-option"><input type="checkbox"><span>Under 50g</span><span class="count">9</span></label>
+          <label class="filter-option"><input type="checkbox"><span>50g – 150g</span><span class="count">18</span></label>
+          <label class="filter-option"><input type="checkbox"><span>150g – 500g</span><span class="count">11</span></label>
+          <label class="filter-option"><input type="checkbox"><span>500g+</span><span class="count">6</span></label>
+        </div>
+        <div class="filter-section">
+          <div class="filter-label">Availability</div>
+          <label class="filter-option"><input type="checkbox" checked><span>In Stock</span><span class="count">37</span></label>
+          <label class="filter-option"><input type="checkbox"><span>Export Ready</span><span class="count">24</span></label>
+        </div>
+        <button class="search-btn" style="width:100%;margin-top:8px" onclick="clearFilters()">Reset Filters</button>
+      </div>
+
+      <!-- Product Grid -->
+      <div class="products-grid">
+        <div class="listing-header">
+          <div class="results-count">Showing <strong>30 products</strong></div>
+          <select class="sort-select" id="sortSelect" onchange="applySort(this.value)">
+            <option value="featured">Sort: Featured</option>
+            <option value="az">Name A–Z</option>
+            <option value="za">Name Z–A</option>
+            <option value="newest">Newest First</option>
+          </select>
+        </div>
+        <div class="product-grid-inner" id="productGrid"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd. &nbsp;|&nbsp;
+      <a onclick="goScreen(1)" style="color:#9ca3af;cursor:pointer">Home</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 3: PRODUCT DETAIL PAGE                          -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen3">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a><a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a><a onclick="goScreen(8)" data-i18n="navExport">Export</a><a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active">EN</button><button>UR</button><button>AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge3">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <a onclick="goScreen(2)">Our Brands</a><span class="sep">›</span>
+    <a>OPUS</a><span class="sep">›</span>
+    <span class="current">OPUS Silk Chocolate</span>
+  </div>
+
+  <div class="page-body">
+    <div class="product-detail-layout">
+      <div class="product-img-main">OPUS</div>
+      <div class="product-detail-info">
+        <div class="product-detail-eyebrow">OPUS Premium Chocolate</div>
+        <div class="product-detail-name">OPUS Silk Chocolate</div>
+        <div class="product-detail-desc">A smooth, premium milk chocolate bar crafted for gifting and premium retail placement. Made with high-quality cocoa and available in 3 SKU sizes — perfect for individual retail, multipacks, and export gift boxes.</div>
+
+        <div style="margin-bottom:14px;font-size:12px;font-weight:600;color:var(--dgray)">FLAVOUR VARIANTS</div>
+        <div class="flavour-row">
+          <button class="flavour-pill active" onclick="setPill(this)">Milk Chocolate</button>
+          <button class="flavour-pill" onclick="setPill(this)">Dark 70%</button>
+          <button class="flavour-pill" onclick="setPill(this)">Hazelnut Crunch</button>
+          <button class="flavour-pill" onclick="setPill(this)">Caramel Swirl</button>
+          <button class="flavour-pill" onclick="setPill(this)">White Velvet</button>
+        </div>
+
+        <div style="margin-bottom:10px;font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.5px">SKU Variants &amp; Trade Information</div>
+        <table class="sku-table">
+          <thead>
+            <tr>
+              <th>SKU Code</th>
+              <th>Pack Size</th>
+              <th>Carton Qty</th>
+              <th>MOQ</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>OPS-SK-080</td>
+              <td>80g bar</td>
+              <td>24 bars/ctn</td>
+              <td>10 cartons</td>
+              <td><span class="in-stock">In Stock</span></td>
+            </tr>
+            <tr>
+              <td>OPS-SK-150</td>
+              <td>150g bar</td>
+              <td>12 bars/ctn</td>
+              <td>6 cartons</td>
+              <td><span class="in-stock">In Stock</span></td>
+            </tr>
+            <tr>
+              <td>OPS-SK-GFT</td>
+              <td>Gift Box (3×80g)</td>
+              <td>18 boxes/ctn</td>
+              <td>4 cartons</td>
+              <td><span class="in-stock">In Stock</span></td>
+            </tr>
+            <tr>
+              <td>OPS-SK-EXP</td>
+              <td>Export Tray (36×80g)</td>
+              <td>4 trays/ctn</td>
+              <td>2 cartons</td>
+              <td><span class="pill-green">Export Ready</span></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="specs-grid">
+          <div class="spec-item"><div class="spec-label">Shelf Life</div><div class="spec-value">18 months</div></div>
+          <div class="spec-item"><div class="spec-label">Storage</div><div class="spec-value">Cool &amp; dry, &lt;25°C</div></div>
+          <div class="spec-item"><div class="spec-label">Certifications</div><div class="spec-value">Halal, ISO 9001</div></div>
+          <div class="spec-item"><div class="spec-label">Origin</div><div class="spec-value">Multan, Pakistan</div></div>
+        </div>
+
+        <div class="detail-ctas">
+          <button class="btn-primary" onclick="addToEnquiry()">&#43; Add to Trade Enquiry</button>
+          <button class="btn-navy" onclick="goScreen(4)">&#128222; Call Sales Team</button>
+          <button class="btn-ghost">&#8681; Download PDF</button>
+        </div>
+
+        <div id="addedMsg" style="display:none;color:var(--green);font-size:13px;font-weight:600;margin-bottom:10px">
+          ✅ OPUS Silk Chocolate added to your trade enquiry list!
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="detail-tabs">
+      <div class="detail-tab active" onclick="setTab(this,'tab1')">Description</div>
+      <div class="detail-tab" onclick="setTab(this,'tab2')">Trade Information</div>
+      <div class="detail-tab" onclick="setTab(this,'tab3')">Export &amp; Certifications</div>
+      <div class="detail-tab" onclick="setTab(this,'tab4')">Download Catalogue</div>
+    </div>
+    <div class="tab-content active" id="tab1">
+      OPUS Silk Chocolate is Volka Food's flagship premium chocolate product, launched in 2021 as part of the luxury OPUS range. The bar features a smooth milk chocolate shell with a silky interior ganache, made from sustainably sourced cocoa. It is designed for both retail shelf placement and premium gifting — available in retail-ready individual bars, branded gift boxes, and bulk export trays.
+    </div>
+    <div class="tab-content" id="tab2">
+      <strong>For trade buyers and distributors:</strong> OPUS Silk Chocolate is available with trade pricing for verified distributors and retail chains. Minimum order quantities start from 6 cartons (150g SKU). Volume pricing available from 50+ cartons. Net 30 payment terms available for established accounts. Contact our sales team at trade@volkafood.com or use the trade enquiry form above for a formal quote within 24 hours.
+    </div>
+    <div class="tab-content" id="tab3">
+      <div class="cert-badges">
+        <div class="cert-badge">✅ Halal Certified — PCHF</div>
+        <div class="cert-badge">🏆 ISO 9001:2015</div>
+        <div class="cert-badge">📋 PSQCA Registered</div>
+        <div class="cert-badge">🌍 GCC Export Approved</div>
+        <div class="cert-badge">🇦🇪 UAE Market Cleared</div>
+      </div>
+      <p style="margin-top:14px;font-size:13px;color:var(--dgray)">All Volka Food products are produced in our PSQCA-registered facility in Multan. Full export documentation — including certificate of origin, halal certificate, and phytosanitary certificate — is available on request for all export SKUs.</p>
+    </div>
+    <div class="tab-content" id="tab4">
+      <p style="font-size:14px;color:var(--dgray);margin-bottom:14px">Download the full OPUS product catalogue for trade use. Includes all SKUs, pack sizes, carton quantities, and pricing guidance.</p>
+      <button class="btn-navy">&#8681; Download OPUS Trade Catalogue (PDF, 2.4 MB)</button>
+      <button class="btn-ghost" style="margin-left:10px">&#8681; Full Volka Food Export Catalogue (PDF, 8.1 MB)</button>
+    </div>
+
+    <!-- Related products -->
+    <div style="margin-top:36px">
+      <div class="section-heading" style="margin-bottom:16px">Related Products</div>
+      <div class="related-grid">
+        <div class="product-card" onclick="setPill(null)">
+          <div class="product-img" style="background:linear-gradient(135deg,#1a1a2e,#16213e);color:#c9a227">OPUS Dark</div>
+          <div class="product-body">
+            <div class="product-name">OPUS Dark 70%</div>
+            <div class="product-meta">80g · 150g · 4 SKUs</div>
+            <div class="product-footer"><span class="in-stock">In Stock</span><button class="add-enquiry" onclick="addRelated(this,event)">+ Enquire</button></div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img" style="background:linear-gradient(135deg,#FF6B6B,#FF8E53)">GIGGLY</div>
+          <div class="product-body">
+            <div class="product-name">GIGGLY Fruit Jellies</div>
+            <div class="product-meta">30g · 80g · 6 SKUs</div>
+            <div class="product-footer"><span class="in-stock">In Stock</span><button class="add-enquiry" onclick="addRelated(this,event)">+ Enquire</button></div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img" style="background:linear-gradient(135deg,#f093fb,#f5576c)">COOKANIA</div>
+          <div class="product-body">
+            <div class="product-name">COOKANIA Cream Biscuits</div>
+            <div class="product-meta">120g · 240g · 5 SKUs</div>
+            <div class="product-footer"><span class="in-stock">In Stock</span><button class="add-enquiry" onclick="addRelated(this,event)">+ Enquire</button></div>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="product-img" style="background:linear-gradient(135deg,#8B0000,#c9a227)">ROYAL</div>
+          <div class="product-body">
+            <div class="product-name">COOKANIA ROYAL Gift Box</div>
+            <div class="product-meta">400g · 800g · 3 SKUs</div>
+            <div class="product-footer"><span class="in-stock">In Stock</span><button class="add-enquiry" onclick="addRelated(this,event)">+ Enquire</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd. &nbsp;|&nbsp;
+      <a onclick="goScreen(1)" style="color:#9ca3af;cursor:pointer">Home</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 4: TRADE ENQUIRY LIST                           -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen4">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a><a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a><a onclick="goScreen(8)" data-i18n="navExport">Export</a><a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle"><button class="active">EN</button><button>UR</button><button>AR</button></div>
+      <button class="nav-enquiry-btn" style="background:var(--red);" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge4">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="progress-bar">
+    <div class="progress-steps">
+      <div class="progress-step done">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Browse Products</div>
+      </div>
+      <div class="progress-step active">
+        <div class="step-dot">2</div>
+        <div class="step-label">Enquiry List</div>
+      </div>
+      <div class="progress-step">
+        <div class="step-dot">3</div>
+        <div class="step-label">Your Details</div>
+      </div>
+      <div class="progress-step">
+        <div class="step-dot">4</div>
+        <div class="step-label">Confirm &amp; Submit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <a onclick="goScreen(2)">Products</a><span class="sep">›</span>
+    <span class="current">Trade Enquiry List</span>
+  </div>
+
+  <div class="page-body">
+    <div class="section-heading">Your Trade Enquiry List</div>
+    <div class="section-sub" style="margin-bottom:20px">Review your selected products before submitting. Add notes and adjust quantities.</div>
+    <div class="autosave">&#128190; Auto-saved just now — your enquiry is preserved if you navigate away</div>
+
+    <div class="enquiry-layout">
+      <div class="enquiry-main">
+        <div class="enquiry-card">
+          <div class="enquiry-card-header">
+            <h3>Selected Products</h3>
+            <span style="font-size:12px;color:#a8c4f0" id="itemCountLabel">0 items</span>
+          </div>
+          <div id="enquiryItems">
+            <div style="padding:32px;text-align:center;color:var(--dgray);font-size:14px" id="emptyMsg">
+              &#128230; No products added yet. <a onclick="goScreen(2)" style="color:var(--accent);cursor:pointer">Browse products →</a>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:#fff;border-radius:10px;box-shadow:var(--shadow);padding:20px;margin-bottom:16px">
+          <div style="font-weight:700;font-size:14px;color:var(--navy);margin-bottom:10px">Trade Notes &amp; Special Requirements</div>
+          <textarea class="notes-area" placeholder="Add any special requirements, target pricing, delivery locations, or specific trade terms you'd like to discuss…"></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap">
+          <button class="btn-ghost" onclick="goScreen(2)">&#43; Add More Products</button>
+          <button class="btn-primary" onclick="goScreen(5)" id="proceedBtn">Proceed to Your Details &nbsp;&#8594;</button>
+        </div>
+      </div>
+
+      <div class="enquiry-sidebar">
+        <div class="summary-card">
+          <div class="summary-title">&#128203; Enquiry Summary</div>
+          <div class="summary-row"><span>Total Products</span><span id="sumProducts">0 SKUs</span></div>
+          <div class="summary-row"><span>Est. Carton Count</span><span id="sumCartons">0 cartons</span></div>
+          <div class="summary-row"><span>Brands Included</span><span id="sumBrands">—</span></div>
+          <div class="summary-row"><span>Status</span><span class="pill-navy">Draft</span></div>
+        </div>
+
+        <div class="summary-card">
+          <div style="font-weight:700;font-size:13px;color:var(--navy);margin-bottom:10px">&#128276; What happens next?</div>
+          <div style="font-size:12px;color:var(--dgray);line-height:1.7">
+            Once submitted, our trade team will review your enquiry and respond within <strong>24 hours</strong> with product availability, pricing, and MOQ confirmation.
+          </div>
+        </div>
+
+        <button class="btn-ghost" style="width:100%;justify-content:center">&#128190; Save Enquiry for Later</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd. &nbsp;|&nbsp;
+      <a onclick="goScreen(1)" style="color:#9ca3af;cursor:pointer">Home</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 5: SUBMIT ENQUIRY / CONFIRMATION                -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen5">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a><a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a><a onclick="goScreen(8)" data-i18n="navExport">Export</a><a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle"><button class="active">EN</button><button>UR</button><button>AR</button></div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge5">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <div class="progress-bar">
+    <div class="progress-steps">
+      <div class="progress-step done"><div class="step-dot">✓</div><div class="step-label">Browse Products</div></div>
+      <div class="progress-step done"><div class="step-dot">✓</div><div class="step-label">Enquiry List</div></div>
+      <div class="progress-step active"><div class="step-dot">3</div><div class="step-label">Your Details</div></div>
+      <div class="progress-step"><div class="step-dot">4</div><div class="step-label">Confirm &amp; Submit</div></div>
+    </div>
+  </div>
+
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <a onclick="goScreen(2)">Products</a><span class="sep">›</span>
+    <a onclick="goScreen(4)">Enquiry List</a><span class="sep">›</span>
+    <span class="current">Submit Enquiry</span>
+  </div>
+
+  <div class="page-body">
+    <!-- Success Banner (shown after submission) -->
+    <div class="success-full" id="successFull">
+      <div class="success-full-top">
+        <div class="success-full-icon">✅</div>
+        <div>
+          <div class="success-full-title">Trade enquiry submitted successfully!</div>
+          <div style="color:#9ae6b4;font-size:13px;margin-top:3px">A confirmation email has been sent to your address.</div>
+        </div>
+      </div>
+      <div class="success-full-ref">
+        Your reference number: <strong id="refNum">VF-ENQ-2026-04817</strong>
+        &nbsp;·&nbsp; Keep this for your records.
+      </div>
+      <div class="success-actions">
+        <button class="btn-white" onclick="goScreen(1)">Return to Homepage</button>
+        <button class="btn-white" onclick="goScreen(2)">Continue Browsing</button>
+      </div>
+    </div>
+
+    <div class="submit-layout" id="submitForm">
+      <div class="submit-form-card">
+        <div class="submit-form-header">
+          <h2>Your Contact Details</h2>
+          <p>Step 3 of 4 — Please fill in your trade contact information</p>
+        </div>
+        <div class="submit-form-body">
+          <div class="submit-grid">
+            <div class="submit-group">
+              <label>FULL NAME *</label>
+              <div class="input-wrap">
+                <input class="submit-input" type="text" id="sName" placeholder="e.g. Muhammad Iffi Abbas" oninput="validateSubmit(this,'name')">
+                <span class="validate-icon" id="sNameIcon"></span>
+              </div>
+            </div>
+            <div class="submit-group">
+              <label>COMPANY NAME *</label>
+              <div class="input-wrap">
+                <input class="submit-input" type="text" id="sCompany" placeholder="e.g. Muhammad Ahmad Marketing" oninput="validateSubmit(this,'text')">
+                <span class="validate-icon" id="sCompanyIcon"></span>
+              </div>
+            </div>
+            <div class="submit-group">
+              <label>EMAIL ADDRESS *</label>
+              <div class="input-wrap">
+                <input class="submit-input" type="email" id="sEmail" placeholder="trade@example.com" oninput="validateSubmit(this,'email')">
+                <span class="validate-icon" id="sEmailIcon"></span>
+              </div>
+            </div>
+            <div class="submit-group">
+              <label>PHONE NUMBER *</label>
+              <div class="input-wrap">
+                <input class="submit-input" type="tel" id="sPhone" placeholder="+92 300 0000000" oninput="validateSubmit(this,'phone')">
+                <span class="validate-icon" id="sPhoneIcon"></span>
+              </div>
+            </div>
+            <div class="submit-group">
+              <label>CITY / TERRITORY</label>
+              <input class="submit-input" type="text" placeholder="e.g. Lahore, Punjab">
+            </div>
+            <div class="submit-group">
+              <label>BUSINESS TYPE</label>
+              <select class="submit-input">
+                <option>Wholesale Distributor</option>
+                <option>Retail Chain</option>
+                <option>Export / Import Agent</option>
+                <option>Food Service</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="submit-group">
+              <label>NUMBER OF OUTLETS / REACH</label>
+              <input class="submit-input" type="text" placeholder="e.g. 12 outlets, Lahore–Faisalabad corridor">
+            </div>
+            <div class="submit-group">
+              <label>PREFERRED CONTACT TIME</label>
+              <select class="submit-input">
+                <option>Anytime</option>
+                <option>Morning (9 AM – 12 PM)</option>
+                <option>Afternoon (12 PM – 5 PM)</option>
+                <option>Evening (5 PM – 8 PM)</option>
+              </select>
+            </div>
+            <div class="submit-group full">
+              <label>ADDITIONAL NOTES</label>
+              <textarea class="submit-input" style="resize:none;min-height:80px" placeholder="Any specific requirements, target SKUs, pricing expectations, or trade terms…"></textarea>
+            </div>
+          </div>
+          <button class="submit-confirm-btn" onclick="submitEnquiry()">
+            &#10003; &nbsp;Confirm &amp; Submit Trade Enquiry
+          </button>
+        </div>
+      </div>
+
+      <div class="what-next">
+        <div class="what-next-title">&#128338; What Happens Next</div>
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-dot">&#10003;</div>
+            <div class="tl-content">
+              <div class="tl-time">Instant</div>
+              <div class="tl-text">Confirmation email with reference number sent to your address</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">1</div>
+            <div class="tl-content">
+              <div class="tl-time">Within 24 hours</div>
+              <div class="tl-text">Trade team reviews enquiry and confirms product availability</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">2</div>
+            <div class="tl-content">
+              <div class="tl-time">Within 48 hours</div>
+              <div class="tl-text">Formal quotation with pricing, MOQ, and delivery terms</div>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-dot">3</div>
+            <div class="tl-content">
+              <div class="tl-time">Week 1–2</div>
+              <div class="tl-text">Order confirmation, payment terms, and delivery scheduling</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.08);border-radius:8px;padding:14px;margin-top:8px">
+          <div style="color:#fff;font-size:12px;font-weight:700;margin-bottom:6px">&#128222; Prefer to call?</div>
+          <div style="color:#a8c4f0;font-size:13px">+92 61 0000000</div>
+          <div style="color:#a8c4f0;font-size:13px">trade@volkafood.com</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd. &nbsp;|&nbsp;
+      <a onclick="goScreen(1)" style="color:#9ca3af;cursor:pointer">Home</a>
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 6: ABOUT US                                       -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen6">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a class="active" onclick="goScreen(6)" data-i18n="navAbout">About Us</a>
+      <a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a>
+      <a onclick="goScreen(8)" data-i18n="navExport">Export</a>
+      <a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang(this,'EN')">EN</button>
+        <button onclick="setLang(this,'UR')">UR</button>
+        <button onclick="setLang(this,'AR')">AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge6">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <span class="current" data-i18n="navAbout">About Us</span>
+  </div>
+  <div class="page-body">
+    <h1 class="section-heading" data-i18n="pageAboutTitle">About Us</h1>
+    <p class="section-sub" style="max-width:760px;line-height:1.9" data-i18n="pageAboutBody">
+      Volka Food International (Pvt.) Ltd. is one of Pakistan's leading manufacturers of confectionery, bakery, chocolate, and pasta products, exporting to over 30 markets across the Middle East and beyond. Our brands — GIGGLY, COOKANIA, OPUS, MARIOS and ROYAL — are trusted by households and trade partners alike for quality, taste, and consistency.
+    </p>
+    <button class="btn-primary" onclick="goScreen(1)" data-i18n="backHome" style="margin-top:24px">← Back to Home</button>
+  </div>
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd.
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 7: EVENTS & MEDIA                                 -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen7">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a>
+      <a class="active" onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a>
+      <a onclick="goScreen(8)" data-i18n="navExport">Export</a>
+      <a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang(this,'EN')">EN</button>
+        <button onclick="setLang(this,'UR')">UR</button>
+        <button onclick="setLang(this,'AR')">AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge7">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <span class="current" data-i18n="navEvents">Events & Media</span>
+  </div>
+  <div class="page-body">
+    <h1 class="section-heading" data-i18n="pageEventsTitle">Events & Media</h1>
+    <p class="section-sub" style="max-width:760px;line-height:1.9" data-i18n="pageEventsBody">
+      Stay up to date with Volka Food's latest exhibitions, trade fairs, product launches, and press coverage. From Gulfood Dubai to local product showcases, find news, photos, and media releases here.
+    </p>
+    <button class="btn-primary" onclick="goScreen(1)" data-i18n="backHome" style="margin-top:24px">← Back to Home</button>
+  </div>
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd.
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 8: EXPORT                                         -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen8">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a>
+      <a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a>
+      <a class="active" onclick="goScreen(8)" data-i18n="navExport">Export</a>
+      <a onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang(this,'EN')">EN</button>
+        <button onclick="setLang(this,'UR')">UR</button>
+        <button onclick="setLang(this,'AR')">AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge8">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <span class="current" data-i18n="navExport">Export</span>
+  </div>
+  <div class="page-body">
+    <h1 class="section-heading" data-i18n="pageExportTitle">Export</h1>
+    <p class="section-sub" style="max-width:760px;line-height:1.9" data-i18n="pageExportBody">
+      Volka Food exports to UAE, Saudi Arabia, Kuwait, Qatar, Oman, and 25+ other markets. We offer trade catalogues, MOQ sheets, halal certifications, and dedicated support for distributors and retail chains worldwide.
+    </p>
+    <button class="btn-primary" onclick="goScreen(1)" data-i18n="backHome" style="margin-top:24px">← Back to Home</button>
+  </div>
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd.
+    </div>
+  </footer>
+</div>
+
+<!-- ════════════════════════════════════════════════════════ -->
+<!-- SCREEN 9: CONTACT                                        -->
+<!-- ════════════════════════════════════════════════════════ -->
+<div class="screen" id="screen9">
+  <nav>
+    <div class="nav-logo" onclick="goScreen(1)">
+      <div class="nav-logo-mark">VF</div>
+      <div class="nav-logo-text">Volka Food<span>International</span></div>
+    </div>
+    <div class="nav-links">
+      <a onclick="goScreen(1)" data-i18n="navHome">Home</a>
+      <a onclick="goScreen(2)" data-i18n="navBrands">Our Brands & Products</a>
+      <a onclick="goScreen(6)" data-i18n="navAbout">About Us</a>
+      <a onclick="goScreen(7)" data-i18n="navEvents">Events & Media</a>
+      <a onclick="goScreen(8)" data-i18n="navExport">Export</a>
+      <a class="active" onclick="goScreen(9)" data-i18n="navContact">Contact</a>
+    </div>
+    <div class="nav-right">
+      <div class="lang-toggle">
+        <button class="active" onclick="setLang(this,'EN')">EN</button>
+        <button onclick="setLang(this,'UR')">UR</button>
+        <button onclick="setLang(this,'AR')">AR</button>
+      </div>
+      <button class="nav-enquiry-btn" onclick="goScreen(4)">
+        Trade Enquiry <span class="enquiry-badge" id="badge9">0</span>
+      </button>
+    </div>
+  </nav>
+  <div class="breadcrumb">
+    <a onclick="goScreen(1)">Home</a><span class="sep">›</span>
+    <span class="current" data-i18n="navContact">Contact</span>
+  </div>
+  <div class="page-body">
+    <h1 class="section-heading" data-i18n="pageContactTitle">Contact Us</h1>
+    <p class="section-sub" style="max-width:760px;line-height:1.9" data-i18n="pageContactBody">
+      Get in touch with our sales and trade teams. Fill out the form below or email us at trade@volkafood.com — our team typically responds within 24 hours.
+    </p>
+    <button class="btn-primary" onclick="scrollContact()" style="margin-top:8px">Go to Contact Form &#8594;</button>
+    <button class="btn-outline" onclick="goScreen(1)" data-i18n="backHome" style="margin-top:8px;margin-left:10px;color:var(--navy);border-color:var(--navy)">← Back to Home</button>
+  </div>
+  <footer>
+    <div style="text-align:center;color:#6b7280;font-size:13px;padding:20px">
+      © 2026 Volka Food International (Pvt.) Ltd.
+    </div>
+  </footer>
+</div>
+
+<!-- Prototype label -->
+<div class="proto-banner">
+  &#9679; HCI Prototype &nbsp;|&nbsp;
+  <span>Screens: </span>
+  <a onclick="goScreen(1)" style="color:#fff;cursor:pointer;font-weight:700">1 Home</a> &nbsp;·&nbsp;
+  <a onclick="goScreen(2)" style="color:#fff;cursor:pointer;font-weight:700">2 Listing</a> &nbsp;·&nbsp;
+  <a onclick="goScreen(3)" style="color:#fff;cursor:pointer;font-weight:700">3 Product Detail</a> &nbsp;·&nbsp;
+  <a onclick="goScreen(4)" style="color:#fff;cursor:pointer;font-weight:700">4 Enquiry List</a> &nbsp;·&nbsp;
+  <a onclick="goScreen(5)" style="color:#fff;cursor:pointer;font-weight:700">5 Submit</a>
+</div>
+
+<script>
+// ── SCREEN NAVIGATION ────────────────────────────────────
+function goScreen(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen' + n).classList.add('active');
+  window.scrollTo(0, 0);
+  updateBadges();
+}
+
+// ── ENQUIRY STATE ─────────────────────────────────────────
+let enquiryItems = [];
+
+function updateBadges() {
+  const n = enquiryItems.length;
+  document.querySelectorAll('[id^="badge"]').forEach(b => b.textContent = n);
+}
+
+function addToEnquiry() {
+  if (!enquiryItems.find(i => i.id === 'opus-silk')) {
+    enquiryItems.push({
+      id: 'opus-silk', name: 'OPUS Silk Chocolate', sku: 'OPS-SK-150 · 150g bar',
+      qty: 6, color: 'linear-gradient(135deg,#1a1a2e,#16213e)', label: 'OPUS'
+    });
+  }
+  updateBadges();
+  renderEnquiry();
+  const msg = document.getElementById('addedMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 3000);
+}
+
+function addRelated(btn, e) {
+  e.stopPropagation();
+  const name = btn.closest('.product-card').querySelector('.product-name').textContent;
+  const id = name.replace(/\s+/g, '-').toLowerCase();
+  if (!enquiryItems.find(i => i.id === id)) {
+    const colors = ['linear-gradient(135deg,#1a1a2e,#16213e)','linear-gradient(135deg,#FF6B6B,#FF8E53)','linear-gradient(135deg,#f093fb,#f5576c)','linear-gradient(135deg,#8B0000,#c9a227)'];
+    const labels = ['OPUS','GIGGLY','COOKANIA','ROYAL'];
+    const idx = Math.floor(Math.random()*4);
+    enquiryItems.push({ id, name, sku: 'Multiple SKUs available', qty: 1, color: colors[idx], label: labels[idx] });
+  }
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  updateBadges();
+  renderEnquiry();
+}
+
+// ── PRODUCT CATALOGUE ─────────────────────────────────────
+// Master product list — used by the listing grid and by both
+// the homepage and listing search bars (case-insensitive,
+// matches name, brand label, or category keywords).
+const ALL_PRODUCTS = [
+  { name: 'GIGGLY Fruit Jellies', meta: '30g · 80g · 6 SKUs', color: 'linear-gradient(135deg,#FF6B6B,#FF8E53)', label: 'GIGGLY', stock: true, category: 'Confectionery' },
+  { name: 'GIGGLY Sour Worms', meta: '25g · 50g · 4 SKUs', color: 'linear-gradient(135deg,#43e97b,#38f9d7)', label: 'GIGGLY', stock: true, category: 'Confectionery' },
+  { name: 'GIGGLY Gummy Bears', meta: '30g · 80g · 5 SKUs', color: 'linear-gradient(135deg,#fa709a,#fee140)', label: 'GIGGLY', stock: true, category: 'Confectionery' },
+  { name: 'GIGGLY Lollipop Twists', meta: '15g · 30g · 3 SKUs', color: 'linear-gradient(135deg,#a18cd1,#fbc2eb)', label: 'GIGGLY', stock: false, category: 'Confectionery' },
+  { name: 'COOKANIA Cream Biscuits', meta: '120g · 240g · 5 SKUs', color: 'linear-gradient(135deg,#f093fb,#f5576c)', label: 'COOKANIA', stock: true, category: 'Bakery' },
+  { name: 'COOKANIA Wafer Rolls', meta: '100g · 200g · 4 SKUs', color: 'linear-gradient(135deg,#ffecd2,#fcb69f)', label: 'COOKANIA', stock: true, category: 'Bakery' },
+  { name: 'COOKANIA Coconut Crunch', meta: '150g · 300g · 3 SKUs', color: 'linear-gradient(135deg,#a1c4fd,#c2e9fb)', label: 'COOKANIA', stock: true, category: 'Bakery' },
+  { name: 'COOKANIA Choco Chip Cookies', meta: '200g · 400g · 3 SKUs', color: 'linear-gradient(135deg,#d4a5a5,#9e7e7e)', label: 'COOKANIA', stock: true, category: 'Bakery' },
+  { name: 'OPUS Silk Chocolate', meta: '80g · 150g · Gift Box', color: 'linear-gradient(135deg,#1a1a2e,#16213e)', label: 'OPUS', stock: true, category: 'Chocolate' },
+  { name: 'OPUS Dark 70%', meta: '80g · 150g · 4 SKUs', color: 'linear-gradient(135deg,#232526,#414345)', label: 'OPUS', stock: true, category: 'Chocolate' },
+  { name: 'OPUS Hazelnut Bar', meta: '100g · 5 SKUs', color: 'linear-gradient(135deg,#4b3a2a,#8b6914)', label: 'OPUS', stock: true, category: 'Chocolate' },
+  { name: 'MARIOS Spaghetti', meta: '400g · 1kg · 3 SKUs', color: 'linear-gradient(135deg,#4facfe,#00f2fe)', label: 'MARIOS', stock: true, category: 'Pasta' },
+  { name: 'MARIOS Penne', meta: '400g · 1kg · 3 SKUs', color: 'linear-gradient(135deg,#0093E9,#80D0C7)', label: 'MARIOS', stock: true, category: 'Pasta' },
+  { name: 'MARIOS Fusilli', meta: '400g · 1kg · 2 SKUs', color: 'linear-gradient(135deg,#8EC5FC,#E0C3FC)', label: 'MARIOS', stock: false, category: 'Pasta' },
+  { name: 'COOKANIA ROYAL Gift Box', meta: '400g · 800g · 3 SKUs', color: 'linear-gradient(135deg,#8B0000,#c9a227)', label: 'ROYAL', stock: true, category: 'Bakery' },
+  { name: 'COOKANIA ROYAL Premium Tin', meta: '600g · 2 SKUs', color: 'linear-gradient(135deg,#c9a227,#8B6914)', label: 'ROYAL', stock: true, category: 'Bakery' },
+];
+
+// Populate (or filter) the product listing grid.
+// `term` — optional search string, matched case-insensitively
+// against product name, brand label, and category.
+let currentSort = 'featured';
+function applySort(val) {
+  currentSort = val;
+  buildProductGrid(document.getElementById('listSearch') ? document.getElementById('listSearch').value : '');
+}
+
+function buildProductGrid(term) {
+  const grid = document.getElementById('productGrid');
+  if (!grid) return;
+
+  const query = (term || '').trim().toLowerCase();
+  let products = query
+    ? ALL_PRODUCTS.filter(p =>
+        p.name.toLowerCase().includes(query) ||
+        p.label.toLowerCase().includes(query) ||
+        p.category.toLowerCase().includes(query)
+      )
+    : ALL_PRODUCTS.slice();
+
+  if (currentSort === 'az') {
+    products = products.slice().sort((a,b) => a.name.localeCompare(b.name));
+  } else if (currentSort === 'za') {
+    products = products.slice().sort((a,b) => b.name.localeCompare(a.name));
+  } else if (currentSort === 'newest') {
+    products = products.slice().reverse();
+  }
+
+  // Update results count if present
+  const countEl = document.querySelector('.results-count');
+  if (countEl) {
+    countEl.innerHTML = query
+      ? `Showing <strong>${products.length} result${products.length !== 1 ? 's' : ''}</strong> for "<strong>${term.trim()}</strong>"`
+      : `Showing <strong>${ALL_PRODUCTS.length} products</strong>`;
+  }
+
+  if (products.length === 0) {
+    grid.innerHTML = `
+      <div class="no-results">
+        <div class="no-results-icon">&#128269;</div>
+        <div class="no-results-title">No products found${query ? ` for "${term.trim()}"` : ''}</div>
+        <div class="no-results-sub">Try a different brand, product name, or category — e.g. GIGGLY, OPUS, Silk, Pasta.</div>
+        <button class="search-btn" onclick="clearAllSearch()">Clear Search</button>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = products.map((p, i) => `
+    <div class="product-card" onclick="${p.label==='OPUS'?'goScreen(3)':''}">
+      <div class="product-img" style="background:${p.color}">${p.label}</div>
+      <div class="product-body">
+        <div class="product-name">${p.name}</div>
+        <div class="product-meta">${p.meta}</div>
+        <div class="product-footer">
+          <span class="${p.stock?'in-stock':'out-stock'}">${p.stock?'In Stock':'Pre-order'}</span>
+          <button class="add-enquiry" onclick="addFromGrid(this,event,'${p.name}','${p.label}','${p.color}')">+ Enquire</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── SEARCH ────────────────────────────────────────────────
+// Homepage search: Enter key or Search button navigates to the
+// listing page (Screen 2) and runs the query there.
+function runHomeSearch() {
+  const term = document.getElementById('homeSearch').value;
+  goScreen(2);
+  const listInput = document.getElementById('listSearch');
+  if (listInput) listInput.value = term;
+  buildProductGrid(term);
+  syncChipsToSearch(term);
+}
+
+// Listing search: live-filter as the user types, and also on
+// Enter / Search button click. Case-insensitive, matches any
+// part of the product name, brand, or category (e.g. "Opus",
+// "OPUS", "Silk", "silk", "pasta" all work).
+function runListSearch() {
+  const term = document.getElementById('listSearch').value;
+  buildProductGrid(term);
+  syncChipsToSearch(term);
+}
+
+function clearAllSearch() {
+  const homeInput = document.getElementById('homeSearch');
+  const listInput = document.getElementById('listSearch');
+  if (homeInput) homeInput.value = '';
+  if (listInput) listInput.value = '';
+  clearFilters();
+  buildProductGrid('');
+}
+
+// When a search term matches a known brand/category, highlight
+// the corresponding filter chip for visual feedback.
+function syncChipsToSearch(term) {
+  const chips = document.querySelectorAll('#listChips .filter-chip');
+  if (!chips.length) return;
+  const query = (term || '').trim().toLowerCase();
+  const map = { 'giggly': 'confectionery', 'opus': 'chocolate', 'marios': 'pasta', 'cookania': 'bakery' };
+  let matchLabel = null;
+  if (query) {
+    for (const [brand, cat] of Object.entries(map)) {
+      if (query.includes(brand) || query.includes(cat)) { matchLabel = cat; break; }
+    }
+  }
+  chips.forEach(c => {
+    const text = c.textContent.trim().toLowerCase();
+    const isMatch = matchLabel && text.includes(matchLabel);
+    c.classList.toggle('active', query ? !!isMatch : text === 'all products');
+  });
+}
+
+function addFromGrid(btn, e, name, label, color) {
+  e.stopPropagation();
+  const id = name.replace(/\s+/g,'-').toLowerCase();
+  if (!enquiryItems.find(i => i.id === id)) {
+    enquiryItems.push({ id, name, sku: 'Multiple SKUs available', qty: 1, color, label });
+  }
+  btn.textContent = '✓ Added';
+  btn.classList.add('added');
+  updateBadges();
+  renderEnquiry();
+}
+
+function renderEnquiry() {
+  const container = document.getElementById('enquiryItems');
+  const empty = document.getElementById('emptyMsg');
+  const label = document.getElementById('itemCountLabel');
+  const sumP = document.getElementById('sumProducts');
+  const sumC = document.getElementById('sumCartons');
+  const sumB = document.getElementById('sumBrands');
+
+  if (!container) return;
+
+  if (enquiryItems.length === 0) {
+    empty && (empty.style.display = 'block');
+    label && (label.textContent = '0 items');
+    sumP && (sumP.textContent = '0 SKUs');
+    sumC && (sumC.textContent = '0 cartons');
+    sumB && (sumB.textContent = '—');
+    return;
+  }
+
+  empty && (empty.style.display = 'none');
+  label && (label.textContent = enquiryItems.length + ' item' + (enquiryItems.length !== 1 ? 's' : ''));
+  sumP && (sumP.textContent = enquiryItems.length + ' SKU' + (enquiryItems.length !== 1 ? 's' : ''));
+  sumC && (sumC.textContent = enquiryItems.reduce((a,i) => a + i.qty, 0) + ' cartons');
+  const brands = [...new Set(enquiryItems.map(i => i.label))];
+  sumB && (sumB.textContent = brands.join(', '));
+
+  container.innerHTML = enquiryItems.map((item, idx) => `
+    <div class="enquiry-item" id="ei-${idx}">
+      <div class="enquiry-item-img" style="background:${item.color}">${item.label}</div>
+      <div class="enquiry-item-info">
+        <div class="enquiry-item-name">${item.name}</div>
+        <div class="enquiry-item-sku">${item.sku}</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${idx},-1)">−</button>
+          <span class="qty-val" id="qty-${idx}">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty(${idx},1)">+</button>
+          <span style="font-size:11px;color:var(--dgray);margin-left:4px">cartons</span>
+        </div>
+      </div>
+      <button class="enquiry-remove" onclick="removeItem(${idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function changeQty(idx, delta) {
+  enquiryItems[idx].qty = Math.max(1, enquiryItems[idx].qty + delta);
+  renderEnquiry();
+}
+
+function removeItem(idx) {
+  enquiryItems.splice(idx, 1);
+  updateBadges();
+  renderEnquiry();
+}
+
+// ── SLIDER ────────────────────────────────────────────────
+let currentSlide = 0;
+let sliderPaused = false;
+let sliderInterval;
+
+function goSlide(n) {
+  currentSlide = (n + 4) % 4;
+  document.getElementById('heroSlides').style.transform = `translateX(-${currentSlide * 100}%)`;
+  document.querySelectorAll('.slider-dot').forEach((d, i) => d.classList.toggle('active', i === currentSlide));
+  document.getElementById('sliderCounter').textContent = `Slide ${currentSlide + 1} of 4`;
+}
+function slideMove(d) { goSlide(currentSlide + d); }
+function togglePause() {
+  sliderPaused = !sliderPaused;
+  const btn = document.getElementById('sliderPauseBtn');
+  if (sliderPaused) {
+    clearInterval(sliderInterval);
+    btn.innerHTML = '&#9654;';
+    btn.title = 'Play slider';
+  } else {
+    btn.innerHTML = '&#10074;&#10074;';
+    btn.title = 'Pause slider';
+    startAutoSlide();
+  }
+}
+function startAutoSlide() {
+  clearInterval(sliderInterval);
+  sliderInterval = setInterval(() => { if (!sliderPaused) goSlide(currentSlide + 1); }, 4500);
+}
+startAutoSlide();
+
+// ── FILTER CHIPS ──────────────────────────────────────────
+function toggleChip(el) {
+  el.closest('.filter-chips').querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+}
+function clearFilters() {
+  document.querySelectorAll('.filter-chip').forEach((c, i) => c.classList.toggle('active', i === 0));
+  const listInput = document.getElementById('listSearch');
+  const homeInput = document.getElementById('homeSearch');
+  if (listInput) listInput.value = '';
+  if (homeInput) homeInput.value = '';
+  buildProductGrid('');
+}
+function setPill(el) {
+  if (!el) return;
+  document.querySelectorAll('.flavour-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+function setTab(el, tabId) {
+  document.querySelectorAll('.detail-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+}
+
+// ── FORM VALIDATION ───────────────────────────────────────
+function validateField(el) {
+  const id = el.id;
+  const errMap = { hName: 'hNameErr', hEmail: 'hEmailErr', hMsg: 'hMsgErr' };
+  const errEl = document.getElementById(errMap[id]);
+  const valid = el.value.trim().length > (id === 'hEmail' ? 4 : 0) && (id !== 'hEmail' || el.value.includes('@'));
+  el.classList.toggle('valid', valid);
+  el.classList.toggle('error', !valid && el.value.length > 0);
+  if (errEl) errEl.classList.toggle('show', !valid && el.value.length > 0);
+}
+
+function submitContactForm() {
+  const name = document.getElementById('hName').value.trim();
+  const email = document.getElementById('hEmail').value.trim();
+  const msg = document.getElementById('hMsg').value.trim();
+  if (!name || !email || !email.includes('@') || !msg) {
+    ['hName','hEmail','hMsg'].forEach(id => {
+      const el = document.getElementById(id);
+      if (!el.value.trim()) { el.classList.add('error'); const errId = id+'Err'; const e = document.getElementById(errId); if(e) e.classList.add('show'); }
+    });
+    return;
+  }
+  document.getElementById('homeSB').classList.add('show');
+  document.getElementById('hName').value = '';
+  document.getElementById('hEmail').value = '';
+  document.getElementById('hMsg').value = '';
+  scrollContact();
+}
+
+function scrollContact() {
+  goScreen(1);
+  setTimeout(() => {
+    const el = document.getElementById('contactSection');
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, 100);
+}
+
+const I18N = {
+  EN: {
+    navHome: 'Home', navBrands: 'Our Brands & Products', navAbout: 'About Us',
+    navEvents: 'Events & Media', navExport: 'Export', navContact: 'Contact',
+    pageAboutTitle: 'About Us', pageAboutBody: 'Volka Food International (Pvt.) Ltd. is one of Pakistan\'s leading manufacturers of confectionery, bakery, chocolate, and pasta products, exporting to over 30 markets across the Middle East and beyond. Our brands — GIGGLY, COOKANIA, OPUS, MARIOS and ROYAL — are trusted by households and trade partners alike for quality, taste, and consistency.',
+    pageEventsTitle: 'Events & Media', pageEventsBody: 'Stay up to date with Volka Food\'s latest exhibitions, trade fairs, product launches, and press coverage. From Gulfood Dubai to local product showcases, find news, photos, and media releases here.',
+    pageExportTitle: 'Export', pageExportBody: 'Volka Food exports to UAE, Saudi Arabia, Kuwait, Qatar, Oman, and 25+ other markets. We offer trade catalogues, MOQ sheets, halal certifications, and dedicated support for distributors and retail chains worldwide.',
+    pageContactTitle: 'Contact Us', pageContactBody: 'Get in touch with our sales and trade teams. Fill out the form below or email us at trade@volkafood.com — our team typically responds within 24 hours.',
+    backHome: '← Back to Home'
+  },
+  UR: {
+    navHome: 'ہوم', navBrands: 'ہمارے برانڈز اور پروڈکٹس', navAbout: 'ہمارے بارے میں',
+    navEvents: 'تقریبات اور میڈیا', navExport: 'ایکسپورٹ', navContact: 'رابطہ کریں',
+    pageAboutTitle: 'ہمارے بارے میں', pageAboutBody: 'والکا فوڈ انٹرنیشنل (پرائیویٹ) لمیٹڈ پاکستان کی معروف کنفیکشنری، بیکری، چاکلیٹ اور پاستا تیار کرنے والی کمپنیوں میں شامل ہے، جو مشرق وسطیٰ اور دیگر 30 سے زیادہ مارکیٹوں میں برآمد کرتی ہے۔ ہمارے برانڈز — گگلی، کوکانیا، اوپس، ماریوس اور رائل — معیار، ذائقے اور یکسانیت کے لیے قابل اعتماد ہیں۔',
+    pageEventsTitle: 'تقریبات اور میڈیا', pageEventsBody: 'والکا فوڈ کی تازہ ترین نمائشوں، تجارتی میلوں، پروڈکٹ لانچ، اور پریس کوریج سے آگاہ رہیں۔ گلف فوڈ دبئی سے لے کر مقامی نمائشوں تک، یہاں خبریں، تصاویر اور میڈیا ریلیز دیکھیں۔',
+    pageExportTitle: 'ایکسپورٹ', pageExportBody: 'والکا فوڈ متحدہ عرب امارات، سعودی عرب، کویت، قطر، عمان اور 25 سے زیادہ دیگر مارکیٹوں میں برآمد کرتا ہے۔ ہم تجارتی کیٹلاگ، MOQ شیٹس، حلال سرٹیفیکیشن، اور تقسیم کاروں کے لیے مخصوص معاونت فراہم کرتے ہیں۔',
+    pageContactTitle: 'ہم سے رابطہ کریں', pageContactBody: 'ہماری سیلز اور ٹریڈ ٹیموں سے رابطہ کریں۔ نیچے فارم پُر کریں یا trade@volkafood.com پر ای میل کریں — ہماری ٹیم عام طور پر 24 گھنٹوں میں جواب دیتی ہے۔',
+    backHome: '← ہوم پیج پر واپس جائیں'
+  }
+};
+
+function setLang(btn, lang) {
+  btn.closest('.lang-toggle').querySelectorAll('button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const dict = I18N[lang] || I18N.EN;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key]) el.textContent = dict[key];
+  });
+  document.documentElement.lang = lang === 'UR' ? 'ur' : 'en';
+  document.documentElement.dir = lang === 'UR' ? 'rtl' : 'ltr';
+  document.querySelectorAll('.lang-toggle').forEach(tg => {
+    tg.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.textContent.trim() === lang);
+    });
+  });
+}
+
+// ── SUBMIT ENQUIRY VALIDATION ──────────────────────────────
+function validateSubmit(el, type) {
+  const iconId = el.id.replace('s', 'sIcon_').replace(/Icon_(.)/,(m,c)=>'Icon'+c.toUpperCase());
+  let valid = false;
+  if (type === 'email') valid = el.value.includes('@') && el.value.includes('.');
+  else if (type === 'phone') valid = el.value.trim().length >= 8;
+  else valid = el.value.trim().length >= 2;
+  el.classList.toggle('valid', valid);
+  el.classList.toggle('error', !valid && el.value.length > 0);
+  // icon next to input
+  const wrap = el.parentElement;
+  let icon = wrap.querySelector('.validate-icon');
+  if (!icon) { icon = document.createElement('span'); icon.className = 'validate-icon'; wrap.style.position='relative'; wrap.appendChild(icon); }
+  icon.textContent = valid ? '✅' : (el.value.length > 0 ? '⚠️' : '');
+}
+
+let refCounter = 4817;
+function submitEnquiry() {
+  const name = document.getElementById('sName').value.trim();
+  const company = document.getElementById('sCompany').value.trim();
+  const email = document.getElementById('sEmail').value.trim();
+  const phone = document.getElementById('sPhone').value.trim();
+  let valid = true;
+  [['sName','name'],['sCompany','text'],['sEmail','email'],['sPhone','phone']].forEach(([id,type]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let v = type==='email' ? (el.value.includes('@')) : el.value.trim().length >= 2;
+    if (!v) { el.classList.add('error'); valid = false; }
+  });
+  if (!valid) return;
+  refCounter++;
+  document.getElementById('refNum').textContent = `VF-ENQ-2026-0${refCounter}`;
+  document.getElementById('submitForm').style.display = 'none';
+  document.getElementById('successFull').classList.add('show');
+  enquiryItems = [];
+  updateBadges();
+  window.scrollTo(0,0);
+}
+
+// ── INIT ──────────────────────────────────────────────────
+buildProductGrid();
+renderEnquiry();
+updateBadges();
+</script>
+
+</body>
+</html>
